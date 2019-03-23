@@ -23,6 +23,11 @@ public class Skeleton : MonoBehaviour
 
 	public GameObject target;
 
+	ConeCollider collCone;
+
+	float damageDelay = .5f;
+	float damageCountDown = .5f;
+
 
     // Start is called before the first frame update
     void Start()
@@ -30,6 +35,7 @@ public class Skeleton : MonoBehaviour
 		rb = GetComponent<Rigidbody>();
 		anim = GetComponent<Animator>();
 		nav = GetComponent<NavMeshAgent>();
+		collCone = transform.Find("cone").GetComponent<ConeCollider>();
 		state = AIState.idle;
 		fireAttackPart = transform.Find("FireBall").GetComponent<ParticleSystem>();
 		em = fireAttackPart.emission;
@@ -85,7 +91,43 @@ public class Skeleton : MonoBehaviour
 			{
 				attackCountdown -= Time.deltaTime;
 				em.enabled = true;
+
+				if(damageCountDown <= 0)
+				{
+					if (collCone.colliders.Count != 0)
+					{
+						foreach (Collider c in collCone.colliders)
+						{
+							if (c.GetComponent<Player>())
+							{
+								c.GetComponent<Player>().Damage(5);
+							}
+						}
+					}
+
+					damageCountDown = damageDelay;
+				}
+				else
+				{
+					damageCountDown -= Time.deltaTime;
+				}
 			}
 		}
+
+		bool canReachPlayer = false;
+		if (collCone.colliders.Count != 0)
+		{
+			foreach (Collider c in collCone.colliders)
+			{
+				if (c.GetComponent<Player>())
+				{
+					canReachPlayer = true;
+					break;
+				}
+			}
+		}
+
+		if (!lockedState && canReachPlayer)
+			state = AIState.attacking;
 	}
 }
