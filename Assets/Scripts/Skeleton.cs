@@ -16,12 +16,21 @@ public class Skeleton : MonoBehaviour
 
 	bool lockedState = false;
 
+	float attackCountdown = 2f;
+	float attackDelay = 2f;
+
+	NavMeshAgent nav;
+
+	public GameObject target;
+
+
     // Start is called before the first frame update
     void Start()
     {
 		rb = GetComponent<Rigidbody>();
 		anim = GetComponent<Animator>();
-		state = AIState.approaching;
+		nav = GetComponent<NavMeshAgent>();
+		state = AIState.idle;
 		fireAttackPart = transform.Find("FireBall").GetComponent<ParticleSystem>();
 		em = fireAttackPart.emission;
 		em.enabled = false;
@@ -31,28 +40,52 @@ public class Skeleton : MonoBehaviour
     void Update()
     {
 
-		if(Input.GetKey(KeyCode.A))
+		if(Input.GetKey(KeyCode.A) && !lockedState)
 		{
 			state = AIState.attacking;
 		}
-		else
+
+		if (Input.GetKey(KeyCode.S) && !lockedState)
 		{
 			state = AIState.approaching;
 		}
 
-        switch(state)
+		if (!lockedState)
 		{
-			case AIState.approaching:
-				anim.Play("Run");
-				break;
-			case AIState.attacking:
-				lockedState = true;
-				anim.Play("CastSpell");
-				break;
-			case AIState.fleeing:
-				break;
-			case AIState.idle:
-				break;
+			switch (state)
+			{
+				case AIState.approaching:
+					nav.speed = 14f;
+					anim.Play("Run");
+					nav.destination = target.transform.position;
+					break;
+				case AIState.attacking:
+					nav.speed = 0;
+					anim.Play("CastSpell");
+					lockedState = true;
+					break;
+				case AIState.fleeing:
+					break;
+				case AIState.idle:
+					anim.Play("Idle");
+					break;
+			}
 		}
-    }
+
+		if (state == AIState.attacking)
+		{
+			if (attackCountdown <= 0)
+			{
+				lockedState = false;
+				state = AIState.idle;
+				attackCountdown = attackDelay;
+				em.enabled = false;
+			}
+			else
+			{
+				attackCountdown -= Time.deltaTime;
+				em.enabled = true;
+			}
+		}
+	}
 }
