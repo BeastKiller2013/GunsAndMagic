@@ -1,7 +1,8 @@
 # GunsAndMagic
 
 ### About This Repo
-This repo is for the CrimsonHacks 2019 Hackthon
+This repo is for the CrimsonHacks 2019 Hackthon.
+
 The skeletons do die, I promise.
 
 ### Credits
