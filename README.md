@@ -2,6 +2,7 @@
 
 ### About This Repo
 This repo is for the CrimsonHacks 2019 Hackthon
+The skeletons do die, I promise.
 
 ### Credits
 Thanks to the Unity Asset Store for the Skeleton model and the fire particle system.
