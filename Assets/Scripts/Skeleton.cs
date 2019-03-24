@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class Skeleton : MonoBehaviour
+public class Skeleton : Enemy
 {
 	Rigidbody rb;
 
@@ -42,10 +42,21 @@ public class Skeleton : MonoBehaviour
 		em.enabled = false;
     }
 
+	bool ded = false;
+
     // Update is called once per frame
     void Update()
     {
+		if(state == AIState.death & !ded)
+		{
+			anim.Play("Death", 0, 5);
+			return;
+		}
 
+		if(ded)
+		{
+			return;
+		}
 
 		if (!lockedState)
 		{
@@ -65,6 +76,9 @@ public class Skeleton : MonoBehaviour
 					break;
 				case AIState.idle:
 					anim.Play("Idle");
+					break;
+				case AIState.death:
+					anim.Play("Death");
 					break;
 			}
 		}
@@ -120,5 +134,18 @@ public class Skeleton : MonoBehaviour
 
 		if (!lockedState && canReachPlayer)
 			state = AIState.attacking;
+		else
+			state = AIState.approaching;
+	}
+
+	protected override void death()
+	{
+		base.death();
+
+		state = AIState.death;
+
+		em.enabled = false;
+
+		lockedState = true;
 	}
 }

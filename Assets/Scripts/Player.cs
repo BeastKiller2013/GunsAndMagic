@@ -15,12 +15,14 @@ public class Player : MonoBehaviour
 
 	float yAngle = 90;
 
-	float yMin = -90;
-	float yMax = 90;
+	float yMin = 90;
+	float yMax = -90;
 
 	Rigidbody rb;
 
-	float forceMult = 500f;
+	float forceMult = 1000f;
+
+	float jumpForce = 3000;
 
 	// Start is called before the first frame update
 	void Start()
@@ -35,11 +37,11 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-		if (yAngle + -lookSensitivity * Input.GetAxis("Mouse Y") < yMin)
+		if (yAngle + -lookSensitivity * Input.GetAxis("Mouse Y") > yMin)
 		{
 			yAngle = yMin;
 		}
-		else if (yAngle + -lookSensitivity * Input.GetAxis("Mouse Y") > yMax)
+		else if (yAngle + -lookSensitivity * Input.GetAxis("Mouse Y") < yMax)
 		{
 			yAngle = yMax;
 		}
@@ -48,14 +50,15 @@ public class Player : MonoBehaviour
 			yAngle += -lookSensitivity * Input.GetAxis("Mouse Y");
 		}
 
-		transform.eulerAngles += lookSensitivity * new Vector3(0, 0, Input.GetAxis("Mouse X"));
-		cameraBoom.eulerAngles = new Vector3(yAngle, cameraBoom.eulerAngles.y, cameraBoom.eulerAngles.z);
+		transform.eulerAngles += lookSensitivity * new Vector3(0, Input.GetAxis("Mouse X"), 0);
+		cameraBoom.localEulerAngles = new Vector3(yAngle, 0, 0);
 
-		Debug.Log(Input.GetAxis("Horizontal"));
-		Debug.Log(Input.GetAxis("Vertical"));
-		Debug.Log(transform.up.ToString());
+		rb.AddForce(forceMult * (transform.forward * Input.GetAxis("Vertical") + transform.right * Input.GetAxis("Horizontal")));
 
-		rb.AddForce(forceMult * (-transform.up * Input.GetAxis("Vertical") + transform.right * Input.GetAxis("Horizontal")));
+		if (rb.velocity.y < .1f && rb.velocity.y > -0.1f)
+		{
+			rb.AddForce(Input.GetAxis("Jump") * transform.forward * jumpForce);
+		}
 	}
 
 	public void Damage(int amount)
