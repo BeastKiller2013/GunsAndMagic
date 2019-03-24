@@ -36,7 +36,7 @@ public class Skeleton : MonoBehaviour
 		anim = GetComponent<Animator>();
 		nav = GetComponent<NavMeshAgent>();
 		collCone = transform.Find("cone").GetComponent<ConeCollider>();
-		state = AIState.idle;
+		state = AIState.approaching;
 		fireAttackPart = transform.Find("FireBall").GetComponent<ParticleSystem>();
 		em = fireAttackPart.emission;
 		em.enabled = false;
@@ -46,15 +46,6 @@ public class Skeleton : MonoBehaviour
     void Update()
     {
 
-		if(Input.GetKey(KeyCode.A) && !lockedState)
-		{
-			state = AIState.attacking;
-		}
-
-		if (Input.GetKey(KeyCode.S) && !lockedState)
-		{
-			state = AIState.approaching;
-		}
 
 		if (!lockedState)
 		{
